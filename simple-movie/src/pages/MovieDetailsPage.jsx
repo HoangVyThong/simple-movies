@@ -2,6 +2,8 @@ import React from "react";
 import { useParams } from "react-router-dom";
 import useSWR from "swr";
 import { fetcher } from "../config";
+import { SwiperSlide, Swiper } from "swiper/react";
+import MovieCard from "../components/movie/MovieCard";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
@@ -51,6 +53,7 @@ const MovieDetailsPage = () => {
       </p>
       <MovieCredit></MovieCredit>
       <MovieVideos></MovieVideos>
+      <MovieSimilar></MovieSimilar>
     </div>
   );
 };
@@ -96,9 +99,63 @@ function MovieVideos() {
   );
 
   if (!data) return null;
+  const { results } = data;
+  if (!results || results.length <= 0) return null;
 
-  console.log("🚀 ~ MovieVideos ~ data:", data);
-  return <div></div>;
+  return (
+    <div className="py-10">
+      <div className="flex flex-col gap-10">
+        {results.slice(0, 2).map((video) => (
+          <div className="" key={video.id}>
+            <h3 className="mb-5 text-xl text-center font-medium bg-secondary inline-block">
+              {video.name}
+            </h3>
+            <div key={video.id} className="w-full aspect-video">
+              <iframe
+                width="1280"
+                height="712"
+                src={`https://www.youtube.com/embed/${video.key}`}
+                title="Youtube video player"
+                frameborder="0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                referrerpolicy="strict-origin-when-cross-origin"
+                allowFullScreen
+                className="w-full h-full object-fill"
+              ></iframe>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function MovieSimilar() {
+  const { movieId } = useParams();
+  const { data } = useSWR(
+    `https://api.themoviedb.org/3/movie/${movieId}/similar?language=en-US`,
+    fetcher
+  );
+  if (!data) return null;
+  const { results } = data;
+  if (!results || results.length <= 0) return null;
+
+  return (
+    <div className="py-10">
+      <h2>Similar movies</h2>
+
+      <div className="movie-list">
+        <Swiper grabCursor={"true"} spaceBetween={40} slidesPerView={"auto"}>
+          {results.length > 0 &&
+            results.map((movie) => (
+              <SwiperSlide key={movie.id}>
+                <MovieCard movie={movie}></MovieCard>
+              </SwiperSlide>
+            ))}
+        </Swiper>
+      </div>
+    </div>
+  );
 }
 
 export default MovieDetailsPage;
