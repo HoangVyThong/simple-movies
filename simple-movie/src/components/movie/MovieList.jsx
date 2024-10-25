@@ -1,13 +1,12 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import MovieCard from "./MovieCard";
 import { SwiperSlide, Swiper } from "swiper/react";
-import "swiper/scss";
 import { fetcher } from "../../config";
 import useSWR from "swr";
 
 const MovieList = ({ type = "now_playing" }) => {
   const [movies, setMovies] = useState([]);
-  const { data, error, isLoading } = useSWR(
+  const { data } = useSWR(
     `https://api.themoviedb.org/3/movie/${type}?language=en-US&page=1`,
     fetcher
   );
