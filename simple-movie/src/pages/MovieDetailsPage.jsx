@@ -1,16 +1,13 @@
 import React from "react";
 import { useParams } from "react-router-dom";
 import useSWR from "swr";
-import { fetcher } from "../config";
+import { fetcher, tmdbAPI } from "../config";
 import { SwiperSlide, Swiper } from "swiper/react";
 import MovieCard from "../components/movie/MovieCard";
 
 const MovieDetailsPage = () => {
   const { movieId } = useParams();
-  const { data } = useSWR(
-    `https://api.themoviedb.org/3/movie/${movieId}?language=en-US`,
-    fetcher
-  );
+  const { data } = useSWR(tmdbAPI.getMovieDetail(movieId), fetcher);
   return (
     <div className="py-10">
       <div className="w-full h-[600px] relative">
@@ -19,16 +16,14 @@ const MovieDetailsPage = () => {
           className="w-full h-full bg-cover bg-no-repeat"
           style={{
             backgroundImage: `url(
-            https://image.tmdb.org/t/p/original${data && data?.backdrop_path}
+            ${tmdbAPI.imageOriginal(data?.backdrop_path)}
           )`,
           }}
         ></div>
       </div>
       <div className="w-full h-[300px] max-w-[800px] mx-auto -mt-[200px] relative z-10 pb-10">
         <img
-          src={`https://image.tmdb.org/t/p/original${
-            data && data?.poster_path
-          }`}
+          src={tmdbAPI.imageOriginal(data?.poster_path)}
           alt=""
           className="w-full h-full object-cover rounded-xl "
         />
@@ -60,10 +55,7 @@ const MovieDetailsPage = () => {
 
 function MovieCredit() {
   const { movieId } = useParams();
-  const { data } = useSWR(
-    `https://api.themoviedb.org/3/movie/${movieId}/credits?language=en-US`,
-    fetcher
-  );
+  const { data } = useSWR(tmdbAPI.getMovieByType(movieId, "credits"), fetcher);
 
   if (!data) return null;
   const { cast } = data;
@@ -77,9 +69,7 @@ function MovieCredit() {
           cast.slice(0, 4).map((item) => (
             <div className="cast-item" key={item.id}>
               <img
-                src={`https://image.tmdb.org/t/p/original${
-                  item && item?.profile_path
-                }`}
+                src={tmdbAPI.imageOriginal(item.profile_path)}
                 alt=""
                 className="w-full h-[350px] object-cover rounded-md mb-3"
               />
@@ -93,10 +83,7 @@ function MovieCredit() {
 
 function MovieVideos() {
   const { movieId } = useParams();
-  const { data } = useSWR(
-    `https://api.themoviedb.org/3/movie/${movieId}/videos?language=en-US`,
-    fetcher
-  );
+  const { data } = useSWR(tmdbAPI.getMovieByType(movieId, "videos"), fetcher);
 
   if (!data) return null;
   const { results } = data;
@@ -132,10 +119,7 @@ function MovieVideos() {
 
 function MovieSimilar() {
   const { movieId } = useParams();
-  const { data } = useSWR(
-    `https://api.themoviedb.org/3/movie/${movieId}/similar?language=en-US`,
-    fetcher
-  );
+  const { data } = useSWR(tmdbAPI.getMovieByType(movieId, "similar"), fetcher);
   if (!data) return null;
   const { results } = data;
   if (!results || results.length <= 0) return null;
