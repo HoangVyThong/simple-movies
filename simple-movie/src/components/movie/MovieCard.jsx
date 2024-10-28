@@ -1,6 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import Button from "../button/button";
+import PropTypes from "prop-types";
+import { withErrorBoundary } from "react-error-boundary";
 
 const MovieCard = ({ movie }) => {
   const { title, release_date, vote_average, poster_path, id } = movie;
@@ -33,4 +35,22 @@ const MovieCard = ({ movie }) => {
   );
 };
 
-export default MovieCard;
+MovieCard.propTypes = {
+  item: PropTypes.shape({
+    title: PropTypes.string,
+    release_date: PropTypes.string,
+    vote_average: PropTypes.number,
+    poster_path: PropTypes.string,
+    id: PropTypes.number,
+  }),
+};
+
+function FallbackComponent() {
+  return (
+    <p className="bg-red-50 text-red-400">
+      Something went wrong with this component
+    </p>
+  );
+}
+
+export default withErrorBoundary(MovieCard, { FallbackComponent });
